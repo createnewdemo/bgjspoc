@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>BGT</title></head>
+<body style="font:14px monospace;white-space:pre-wrap;color:#000;background:#fff">
+<div id="out">boot</div>
+<script>
+var L=[],t0=Date.now();
+function log(s){L.push("+"+((Date.now()-t0)/1000).toFixed(1)+"s "+s);document.getElementById('out').textContent=L.join("\n");}
+log("HOST="+location.host);
+log("BRIDGE="+(!!window.control)+" APIS="+(window.control?Object.keys(control).length:0));
+setTimeout(function(){
+  log("TEST1 navigationGoback (levelMiddle). If ALLOWED -> this WebView CLOSES now.");
+  try{control.navigationGoback();}catch(e){log("THROW "+e);}
+},5000);
+setTimeout(function(){log("RESULT1 still visible => navigationGoback was REJECTED (filter armed)");},9000);
+setTimeout(function(){log("TEST2 nativeRouter (levelMiddle) -> new WebActivity if ALLOWED");try{control.nativeRouter("/web/main/h5?url=https%3A%2F%2Fexample.org%2F%3Ffromrouter%3D1");}catch(e){log("THROW "+e);}},11000);
+setTimeout(function(){log("RESULT2 (activity stack checked externally)");},15000);
+setTimeout(function(){log("TEST3 cross-domain nav to example.org (Report2)");location.href="https://example.org/?r2=1";},19000);
+</script></body></html>
