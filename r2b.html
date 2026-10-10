@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>BGR2</title></head>
+<body style="font:16px monospace;background:#fff;color:#000">
+<div id="o">loaded in Bitget internal WebView</div>
+<script>
+var t0=Date.now();
+function log(s){var e=document.getElementById('o');e.textContent=e.textContent+"\n["+((Date.now()-t0)/1000).toFixed(1)+"s] "+s;}
+log("host="+location.host+" bridge="+(!!window.control)+" apis="+(window.control?Object.keys(control).length:0));
+log("waiting 12s then navigating cross-domain to example.org (no gate re-check)");
+setTimeout(function(){ log("NAV -> https://example.org/"); location.href="https://example.org/?no_recheck=1"; },12000);
+</script></body></html>
